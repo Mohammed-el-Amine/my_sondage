@@ -1,19 +1,27 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import Signup from './components/Signup'; // Importer le composant Signup
 
 export default function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showSignup, setShowSignup] = useState(false); // Ajouter le state showSignup pour afficher/masquer le composant Signup
 
   const handleLogin = () => {
-    // Ajouter ici la logique de connexion
     console.log('Connexion avec email:', email, 'et mot de passe:', password);
   };
 
   const handleSignup = () => {
-    // Ajouter ici la logique d'inscription
-    console.log("Rediriger vers la page d'inscription");
+    setShowSignup(true); // Afficher le composant Signup
   };
+
+  const handleBack = () => {
+    setShowSignup(false); // Masquer le composant Signup
+  };
+
+  if (showSignup) {
+    return <Signup handleBack={handleBack} />;
+  }
 
   return (
     <View style={styles.container}>
