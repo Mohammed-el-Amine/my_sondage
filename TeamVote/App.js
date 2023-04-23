@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import Signup from './components/Signup';
 import axios from 'axios';
+import Profile from './components/Profile';
 
 export default function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showSignup, setShowSignup] = useState(false);
+  const [userId, setUserId] = useState(null);
 
   const handleLogin = () => {
     console.log('Connexion avec email:', email, 'et mot de passe:', password);
@@ -17,7 +19,7 @@ export default function App() {
     })
       .then((response) => {
         console.log("Connected");
-        // Faire quelque chose avec la réponse, comme stocker le jeton d'accès dans le state
+        setUserId(response.data.userId); // stocker l'id utilisateur dans le state
       })
       .catch((error) => {
         console.log(error);
@@ -35,6 +37,10 @@ export default function App() {
 
   if (showSignup) {
     return <Signup handleBack={handleBack} />;
+  }
+
+  if (userId) { // si l'utilisateur est connecté
+    return <Profile userId={userId} />; // afficher le composant Profile en lui passant l'userId en tant que prop
   }
 
   return (
