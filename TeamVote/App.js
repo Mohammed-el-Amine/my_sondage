@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import Signup from './components/Signup';
+import axios from 'axios';
 
 export default function App() {
   const [email, setEmail] = useState('');
@@ -9,6 +10,19 @@ export default function App() {
 
   const handleLogin = () => {
     console.log('Connexion avec email:', email, 'et mot de passe:', password);
+
+    axios.post('http://192.168.1.117:3000/login', {
+      email: email,
+      password: password
+    })
+      .then((response) => {
+        console.log("Connected");
+        // Faire quelque chose avec la réponse, comme stocker le jeton d'accès dans le state
+      })
+      .catch((error) => {
+        console.log(error);
+        // Afficher une erreur à l'utilisateur
+      });
   };
 
   const handleSignup = () => {
