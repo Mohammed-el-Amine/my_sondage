@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-// const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -9,7 +8,6 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Votre URI de connexion MongoDB
 const uri = "mongodb+srv://test:test@sondage.bedthyv.mongodb.net/?retryWrites=true&w=majority";
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -58,38 +56,76 @@ app.post('/signup', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    // Extraire les données du corps de la requête
+
     const { email, password } = req.body;
+
+    try {
+        const user = await userCollection.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: 'Adresse email ou mot de passe incorrect.' });
+        }
+
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        if (!isPasswordCorrect) {
+            return res.status(401).json({ message: 'Adresse email ou mot de passe incorrect.' });
+        }
+        
+        res.status(200).json({ message: 'Connexion réussie.', userId: user._id });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Une erreur est survenue lors de la connexion.' });
+    }
+});
+
+app.get('/profile/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Vérifier si l'utilisateur existe dans la base de données
+        const user = await userCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+        if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+        }
+
+        // Retourner les informations de l'utilisateur
+        res.status(200).json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Une erreur est survenue lors de la récupération des informations de l\'utilisateur.' });
+    }
+});
+
+app.post('/profile/:id/password', async (req, res) => {
+    const { id } = req.params;
+    const { password } = req.body;
   
     try {
       // Vérifier si l'utilisateur existe dans la base de données
-      const user = await userCollection.findOne({ email });
+      const user = await userCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
       if (!user) {
-        return res.status(401).json({ message: 'Adresse email ou mot de passe incorrect.' });
+        return res.status(404).json({ message: 'Utilisateur non trouvé.' });
       }
   
-      // Vérifier si le mot de passe est correct
-      const isPasswordCorrect = await bcrypt.compare(password, user.password);
-      if (!isPasswordCorrect) {
-        return res.status(401).json({ message: 'Adresse email ou mot de passe incorrect.' });
-      }
+      // Hasher le nouveau mot de passe
+      const hashedPassword = await bcrypt.hash(password, 10);
   
-      // Retourner un message de succès
-      res.status(200).json({ message: 'Connexion réussie.' });
+      // Mettre à jour le mot de passe de l'utilisateur
+      await userCollection.updateOne({ _id: new mongoose.Types.ObjectId(id) }, { $set: { password: hashedPassword } });
+  
+      res.status(200).json({ message: 'Mot de passe modifié avec succès.' });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Une erreur est survenue lors de la connexion.' });
+      res.status(500).json({ message: 'Une erreur est survenue lors de la modification du mot de passe.' });
     }
   });
+  
 
-// Gestion d'erreur 404
 app.use((req, res, next) => {
     const error = new Error('404 - Page non trouvée');
     error.status = 404;
     next(error);
 });
 
-// Gestion des erreurs globales
 app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.send({
