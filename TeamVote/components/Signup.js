@@ -10,12 +10,22 @@ export default function Signup({ handleBack }) {
     const [password, setPassword] = useState('');
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
     const [typeCompte, setTypeCompte] = useState('particulier');
+    const [nomEntreprise, setNomEntreprise] = useState('');
+    const [adresseEntreprise, setAdresseEntreprise] = useState('');
+    const [telephoneEntreprise, setTelephoneEntreprise] = useState('');
 
     const handleSignup = () => {
         console.log('Inscription avec nom:', nom, 'prenom:', prenom, 'date de naissance:', dateNaissance, 'adresse:', adresse, 'email:', email, 'mot de passe:', password, 'confirmation mot de passe:', passwordConfirmation, 'type de compte:', typeCompte);
+
+        if (typeCompte === 'particulier') {
+            // Appeler la fonction de validation pour le formulaire particulier
+        } else {
+            // Appeler la fonction de validation pour le formulaire entreprise
+        }
     };
 
     return (
+        <ScrollView contentContainerStyle={styles.scrollViewContainer}>
             <View style={styles.container}>
                 <TouchableOpacity style={styles.backButton} onPress={handleBack}>
                     <Text style={styles.backButtonText}>Retour</Text>
@@ -38,33 +48,63 @@ export default function Signup({ handleBack }) {
                     </TouchableOpacity>
                 </View>
 
-                <TextInput
-                    style={styles.input}
-                    placeholder="Nom"
-                    autoCapitalize="words"
-                    value={nom}
-                    onChangeText={setNom}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Prénom"
-                    autoCapitalize="words"
-                    value={prenom}
-                    onChangeText={setPrenom}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Date de naissance"
-                    keyboardType="numeric"
-                    value={dateNaissance}
-                    onChangeText={setDateNaissance}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Adresse"
-                    value={adresse}
-                    onChangeText={setAdresse}
-                />
+                {typeCompte === 'particulier' && (
+                    <>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Nom"
+                            autoCapitalize="words"
+                            value={nom}
+                            onChangeText={setNom}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Prénom"
+                            autoCapitalize="words"
+                            value={prenom}
+                            onChangeText={setPrenom}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Date de naissance"
+                            keyboardType="numeric"
+                            value={dateNaissance}
+                            onChangeText={setDateNaissance}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Adresse"
+                            value={adresse}
+                            onChangeText={setAdresse}
+                        />
+                    </>
+                )}
+
+                {typeCompte === 'entreprise' && (
+                    <>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Nom de l'entreprise"
+                            autoCapitalize="words"
+                            value={nomEntreprise}
+                            onChangeText={setNomEntreprise}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Adresse de l'entreprise"
+                            value={adresseEntreprise}
+                            onChangeText={setAdresseEntreprise}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Numéro de téléphone de l'entreprise"
+                            keyboardType="phone-pad"
+                            value={telephoneEntreprise}
+                            onChangeText={setTelephoneEntreprise}
+                        />
+                    </>
+                )}
+
                 <TextInput
                     style={styles.input}
                     placeholder="Email"
@@ -93,7 +133,9 @@ export default function Signup({ handleBack }) {
                     <Text style={styles.buttonText}>S'inscrire</Text>
                 </TouchableOpacity>
             </View>
+        </ScrollView>
     );
+
 }
 
 const styles = StyleSheet.create({
@@ -119,7 +161,7 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     input: {
-        width: '80%',
+        width: 300,
         height: 50,
         borderWidth: 1,
         borderColor: '#ccc',
@@ -190,5 +232,10 @@ const styles = StyleSheet.create({
     },
     checkboxLabel: {
         fontSize: 16,
+    },
+    scrollViewContainer: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
