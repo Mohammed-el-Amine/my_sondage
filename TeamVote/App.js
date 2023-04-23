@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import Signup from './components/Signup'; // Importer le composant Signup
+import Signup from './components/Signup';
 
 export default function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showSignup, setShowSignup] = useState(false); // Ajouter le state showSignup pour afficher/masquer le composant Signup
+  const [showSignup, setShowSignup] = useState(false);
 
   const handleLogin = () => {
     console.log('Connexion avec email:', email, 'et mot de passe:', password);
   };
 
   const handleSignup = () => {
-    setShowSignup(true); // Afficher le composant Signup
+    setShowSignup(true);
   };
 
   const handleBack = () => {
-    setShowSignup(false); // Masquer le composant Signup
+    setShowSignup(false);
   };
 
   if (showSignup) {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Picker } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import axios from 'axios';
 
 export default function Signup({ handleBack }) {
     const [nom, setNom] = useState('');
@@ -8,20 +9,37 @@ export default function Signup({ handleBack }) {
     const [adresse, setAdresse] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [passwordConfirmation, setPasswordConfirmation] = useState('');
-    const [typeCompte, setTypeCompte] = useState('particulier');
-    const [nomEntreprise, setNomEntreprise] = useState('');
-    const [adresseEntreprise, setAdresseEntreprise] = useState('');
-    const [telephoneEntreprise, setTelephoneEntreprise] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
-    const handleSignup = () => {
-        console.log('Inscription avec nom:', nom, 'prenom:', prenom, 'date de naissance:', dateNaissance, 'adresse:', adresse, 'email:', email, 'mot de passe:', password, 'confirmation mot de passe:', passwordConfirmation, 'type de compte:', typeCompte);
+    const handleSignup = async () => {
+        const userData = {
+            nom,
+            prenom,
+            dateNaissance,
+            adresse,
+            email,
+            password,
+            confirmPassword,
+        };
 
-        if (typeCompte === 'particulier') {
-            // Appeler la fonction de validation pour le formulaire particulier
-        } else {
-            // Appeler la fonction de validation pour le formulaire entreprise
+        try {
+            const response = await axios.post('http://192.168.1.117:3000/signup', userData);
+            console.log(response.data);
+            Alert.alert('Succès', 'Le formulaire a été soumis avec succès.');
+            resetForm();
+        } catch (error) {
+            console.error(error);
         }
+    };
+
+    const resetForm = () => {
+        setNom('');
+        setPrenom('');
+        setDateNaissance('');
+        setAdresse('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
     };
 
     return (
@@ -32,78 +50,35 @@ export default function Signup({ handleBack }) {
                 </TouchableOpacity>
                 <Text style={styles.title}>Inscription TeamVote</Text>
 
-                <View style={styles.typeCompte}>
-                    <Text style={styles.typeCompteLabel}>Je suis un :</Text>
-                    <TouchableOpacity
-                        style={[styles.typeCompteButton, typeCompte === 'particulier' && styles.typeCompteButtonSelected]}
-                        onPress={() => setTypeCompte('particulier')}
-                    >
-                        <Text style={styles.typeCompteButtonText}>Particulier</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.typeCompteButton, typeCompte === 'entreprise' && styles.typeCompteButtonSelected]}
-                        onPress={() => setTypeCompte('entreprise')}
-                    >
-                        <Text style={styles.typeCompteButtonText}>Entreprise</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {typeCompte === 'particulier' && (
-                    <>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Nom"
-                            autoCapitalize="words"
-                            value={nom}
-                            onChangeText={setNom}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Prénom"
-                            autoCapitalize="words"
-                            value={prenom}
-                            onChangeText={setPrenom}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Date de naissance"
-                            keyboardType="numeric"
-                            value={dateNaissance}
-                            onChangeText={setDateNaissance}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Adresse"
-                            value={adresse}
-                            onChangeText={setAdresse}
-                        />
-                    </>
-                )}
-
-                {typeCompte === 'entreprise' && (
-                    <>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Nom de l'entreprise"
-                            autoCapitalize="words"
-                            value={nomEntreprise}
-                            onChangeText={setNomEntreprise}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Adresse de l'entreprise"
-                            value={adresseEntreprise}
-                            onChangeText={setAdresseEntreprise}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Numéro de téléphone de l'entreprise"
-                            keyboardType="phone-pad"
-                            value={telephoneEntreprise}
-                            onChangeText={setTelephoneEntreprise}
-                        />
-                    </>
-                )}
+                <>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Nom"
+                        autoCapitalize="words"
+                        value={nom}
+                        onChangeText={setNom}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Prénom"
+                        autoCapitalize="words"
+                        value={prenom}
+                        onChangeText={setPrenom}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Date de naissance"
+                        keyboardType="numeric"
+                        value={dateNaissance}
+                        onChangeText={setDateNaissance}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Adresse"
+                        value={adresse}
+                        onChangeText={setAdresse}
+                    />
+                </>
 
                 <TextInput
                     style={styles.input}
@@ -126,8 +101,8 @@ export default function Signup({ handleBack }) {
                     placeholder="Confirmation de mot de passe"
                     secureTextEntry={true}
                     autoCapitalize="none"
-                    value={passwordConfirmation}
-                    onChangeText={setPasswordConfirmation}
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
                 />
                 <TouchableOpacity style={styles.button} onPress={handleSignup}>
                     <Text style={styles.buttonText}>S'inscrire</Text>
