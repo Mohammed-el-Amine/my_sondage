@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+// const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -55,6 +56,31 @@ app.post('/signup', async (req, res) => {
         res.status(500).json({ message: 'Une erreur est survenue lors de la création de l\'utilisateur.' });
     }
 });
+
+app.post('/login', async (req, res) => {
+    // Extraire les données du corps de la requête
+    const { email, password } = req.body;
+  
+    try {
+      // Vérifier si l'utilisateur existe dans la base de données
+      const user = await userCollection.findOne({ email });
+      if (!user) {
+        return res.status(401).json({ message: 'Adresse email ou mot de passe incorrect.' });
+      }
+  
+      // Vérifier si le mot de passe est correct
+      const isPasswordCorrect = await bcrypt.compare(password, user.password);
+      if (!isPasswordCorrect) {
+        return res.status(401).json({ message: 'Adresse email ou mot de passe incorrect.' });
+      }
+  
+      // Retourner un message de succès
+      res.status(200).json({ message: 'Connexion réussie.' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Une erreur est survenue lors de la connexion.' });
+    }
+  });
 
 // Gestion d'erreur 404
 app.use((req, res, next) => {
