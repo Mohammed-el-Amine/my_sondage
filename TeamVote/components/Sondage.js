@@ -27,7 +27,7 @@ const Sondages = ({ userId }) => {
             <Text style={styles.title}>Liste des sondages</Text>
             {sondages.map((sondage, index) => (
                 <View key={index} style={styles.sondageContainer}>
-                    <Text style={styles.sondageTitle}>{sondage.title}</Text>
+                    <Text style={styles.sondageTitle}>{sondage.titre}</Text>
                     <Text>{sondage.description}</Text>
                 </View>
             ))}
