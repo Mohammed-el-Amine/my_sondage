@@ -154,6 +154,24 @@ app.get('/sondages', async (req, res) => {
     }
 });
 
+app.get('/sondages/:id', async (req, res) => {
+    const sondageId = req.params.id;
+
+    try {
+        const sondagesCollection = mongoose.connection.collection('sondages');
+        const sondage = await sondagesCollection.findOne({ _id: new mongoose.Types.ObjectId(sondageId) });
+
+        if (!sondage) {
+            return res.status(404).json({ message: 'Sondage non trouvé' });
+        }
+
+        res.status(200).json(sondage);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Une erreur est survenue lors de la récupération du sondage.' });
+    }
+});
+
 app.use((req, res, next) => {
     const error = new Error('404 - Page non trouvée');
     error.status = 404;
