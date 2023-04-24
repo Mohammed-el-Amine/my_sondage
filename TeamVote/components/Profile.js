@@ -7,7 +7,7 @@ import Header from './Header';
 
 const Profile = ({ userId }) => {
     const [user, setUser] = useState(null);
-    const [newPassword, setNewPassword] = useState('');
+    const [password, setPassword] = useState('');
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -35,8 +35,9 @@ const Profile = ({ userId }) => {
 
     const handleChangePassword = async () => {
         try {
-            await axios.post(`/profile/${userId}/password`, { newPassword });
+            await axios.post(`http://10.68.255.234:3000/profile/${userId}/password`, { password });
             alert('Mot de passe modifié avec succès !');
+            setPassword('');
         } catch (error) {
             console.error(error);
             alert('Une erreur est survenue lors de la modification du mot de passe.');
@@ -58,8 +59,8 @@ const Profile = ({ userId }) => {
                     <Text style={styles.label}>Nouveau mot de passe : </Text>
                     <TextInput
                         style={styles.input}
-                        value={newPassword}
-                        onChangeText={(text) => setNewPassword(text)}
+                        value={password}
+                        onChangeText={(text) => setPassword(text)}
                         secureTextEntry={true}
                     />
                     <TouchableOpacity style={styles.button} onPress={handleChangePassword}>

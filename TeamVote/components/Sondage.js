@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Modal } from 'react-native';
+import { View, Text, StyleSheet, Button, Modal, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import SondageForm from './SondageForm';
+import ShowSondage from './ShowSondage';
 
 const Sondages = ({ userId }) => {
     const [sondages, setSondages] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
-    // console.log(userId)
+    const [selectedSondageId, setSelectedSondageId] = useState(null);
+
     useEffect(() => {
         axios.get('http://10.68.255.234:3000/sondages')
             .then(response => {
@@ -21,26 +23,59 @@ const Sondages = ({ userId }) => {
         setModalVisible(true);
     };
 
+    const handleSondageClick = (sondageId) => {
+        setSelectedSondageId(sondageId);
+        setModalVisible(true);
+    };
+
+    const handleModalClose = () => {
+        setSelectedSondageId(null);
+        setModalVisible(false);
+    };
+
     return (
         <View style={styles.container}>
             <Button title="Créer un sondage" onPress={handleCreateSondageClick} />
             <Text style={styles.title}>Liste des sondages</Text>
             {sondages.map((sondage, index) => (
-                <View key={index} style={styles.sondageContainer}>
+                <TouchableOpacity
+                    key={index}
+                    style={styles.sondageContainer}
+                    onPress={() => handleSondageClick(sondage._id)}
+                >
                     <Text style={styles.sondageTitle}>{sondage.titre}</Text>
                     <Text>{sondage.description}</Text>
-                </View>
+                </TouchableOpacity>
             ))}
             <Modal visible={modalVisible} animationType="slide">
                 <View style={styles.modalContainer}>
-                    <Text style={styles.modalTitle}>Création de sondage</Text>
-                    <Button title="Annuler" onPress={() => setModalVisible(false)} />
-                    <Text style={styles.newLine}></Text>
-                    <SondageForm userId={userId} />
+                    {selectedSondageId !== null ? (
+                        <>
+                            <TouchableOpacity onPress={handleModalClose}>
+                                <Text style={styles.modalButton}>Retour</Text>
+                            </TouchableOpacity>
+                            <View style={styles.modalHeader}>
+                                <Text style={styles.modalTitle}>{'\n'}Informations du sondage: {'\n'}</Text>
+                            </View>
+                            <ShowSondage sondageId={selectedSondageId} />
+                        </>
+                    ) : (
+                        <>
+                            <View style={styles.modalHeader}>
+                                <Text style={styles.modalTitle}>Création de sondage</Text>
+                                <TouchableOpacity onPress={handleModalClose}>
+                                    <Text style={styles.modalButton}>Retour</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <SondageForm userId={userId} />
+                        </>
+                    )}
+
                 </View>
             </Modal>
         </View>
     );
+
 };
 
 const styles = StyleSheet.create({
@@ -50,18 +85,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     title: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: 'bold',
-        marginBottom: 20,
-        textAlign: 'center',
+        marginBottom: 10,
     },
     sondageContainer: {
-        marginBottom: 20,
+        padding: 10,
+        backgroundColor: '#eee',
+        borderRadius: 5,
+        marginBottom: 10,
     },
     sondageTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        marginBottom: 10,
+        marginBottom: 5,
     },
     modalContainer: {
         flex: 1,
