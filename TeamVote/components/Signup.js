@@ -23,7 +23,7 @@ export default function Signup({ handleBack }) {
         };
 
         try {
-            const response = await axios.post('http://192.168.1.117:3000/signup', userData);
+            const response = await axios.post('http://10.68.255.234:3000/signup', userData);
             console.log(response.data);
             Alert.alert('Succès', 'Le formulaire a été soumis avec succès.');
             resetForm();
