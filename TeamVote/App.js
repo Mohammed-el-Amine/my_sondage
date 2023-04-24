@@ -11,19 +11,20 @@ export default function App() {
   const [userId, setUserId] = useState(null);
 
   const handleLogin = () => {
+
     console.log('Connexion avec email:', email, 'et mot de passe:', password);
 
-    axios.post('http://192.168.1.117:3000/login', {
+    axios.post('http://10.68.255.234:3000/login', {
       email: email,
       password: password
     })
       .then((response) => {
         console.log("Connected");
-        setUserId(response.data.userId); // stocker l'id utilisateur dans le state
+        setUserId(response.data.userId);
+        console.log(response.data.userId);
       })
       .catch((error) => {
         console.log(error);
-        // Afficher une erreur à l'utilisateur
       });
   };
 
@@ -39,37 +40,37 @@ export default function App() {
     return <Signup handleBack={handleBack} />;
   }
 
-  if (userId) { // si l'utilisateur est connecté
-    return <Profile userId={userId} />; // afficher le composant Profile en lui passant l'userId en tant que prop
+  if (userId) {
+    return <Profile userId={userId} />;
+  } else {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>TeamVote by Softeam</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Mot de passe"
+          secureTextEntry={true}
+          autoCapitalize="none"
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Se connecter</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.signupLink} onPress={handleSignup}>
+          <Text style={styles.signupLinkText}>Pas encore de compte ? S'inscrire</Text>
+        </TouchableOpacity>
+      </View>
+    );
   }
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>TeamVote by Softeam</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Mot de passe"
-        secureTextEntry={true}
-        autoCapitalize="none"
-        value={password}
-        onChangeText={setPassword}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Se connecter</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.signupLink} onPress={handleSignup}>
-        <Text style={styles.signupLinkText}>Pas encore de compte ? S'inscrire</Text>
-      </TouchableOpacity>
-    </View>
-  );
 }
 
 const styles = StyleSheet.create({
