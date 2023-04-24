@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, Button, Modal } from 'react-native';
 import axios from 'axios';
 import SondageForm from './SondageForm';
 
-const Sondages = () => {
+const Sondages = ({ userId }) => {
     const [sondages, setSondages] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
-
+    // console.log(userId)
     useEffect(() => {
-        axios.get('http://localhost:3000/sondages')
+        axios.get('http://10.68.255.234:3000/sondages')
             .then(response => {
                 setSondages(response.data);
             })
@@ -34,10 +34,9 @@ const Sondages = () => {
             <Modal visible={modalVisible} animationType="slide">
                 <View style={styles.modalContainer}>
                     <Text style={styles.modalTitle}>Création de sondage</Text>
-                    {/* Formulaire de création de sondage ici */}
                     <Button title="Annuler" onPress={() => setModalVisible(false)} />
                     <Text style={styles.newLine}></Text>
-                    <SondageForm />
+                    <SondageForm userId={userId} />
                 </View>
             </Modal>
         </View>

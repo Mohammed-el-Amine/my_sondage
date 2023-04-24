@@ -4,17 +4,17 @@ import Reglement from './Reglement';
 import Sondage from './Sondage';
 import Stats from './Stats';
 
-const Header = () => {
+const Header = ({ userId }) => {
     const [selectedComponent, setSelectedComponent] = useState('');
-
+    // console.log(userId)
     const renderComponent = () => {
         switch (selectedComponent) {
             case 'Reglement':
-                return <Reglement />;
+                return <Reglement userId={userId} />;
             case 'Sondage':
-                return <Sondage />;
+                return <Sondage userId={userId} />;
             case 'Stats':
-                return <Stats />;
+                return <Stats userId={userId} />;
             default:
                 return null;
         }

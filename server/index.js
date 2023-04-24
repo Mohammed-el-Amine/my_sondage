@@ -69,7 +69,7 @@ app.post('/login', async (req, res) => {
         if (!isPasswordCorrect) {
             return res.status(401).json({ message: 'Adresse email ou mot de passe incorrect.' });
         }
-        
+
         res.status(200).json({ message: 'Connexion réussie.', userId: user._id });
     } catch (error) {
         console.error(error);
@@ -98,27 +98,50 @@ app.get('/profile/:id', async (req, res) => {
 app.post('/profile/:id/password', async (req, res) => {
     const { id } = req.params;
     const { password } = req.body;
-  
+
     try {
-      // Vérifier si l'utilisateur existe dans la base de données
-      const user = await userCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
-      if (!user) {
-        return res.status(404).json({ message: 'Utilisateur non trouvé.' });
-      }
-  
-      // Hasher le nouveau mot de passe
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      // Mettre à jour le mot de passe de l'utilisateur
-      await userCollection.updateOne({ _id: new mongoose.Types.ObjectId(id) }, { $set: { password: hashedPassword } });
-  
-      res.status(200).json({ message: 'Mot de passe modifié avec succès.' });
+        // Vérifier si l'utilisateur existe dans la base de données
+        const user = await userCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+        if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+        }
+
+        // Hasher le nouveau mot de passe
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Mettre à jour le mot de passe de l'utilisateur
+        await userCollection.updateOne({ _id: new mongoose.Types.ObjectId(id) }, { $set: { password: hashedPassword } });
+
+        res.status(200).json({ message: 'Mot de passe modifié avec succès.' });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Une erreur est survenue lors de la modification du mot de passe.' });
+        console.error(error);
+        res.status(500).json({ message: 'Une erreur est survenue lors de la modification du mot de passe.' });
     }
-  });
-  
+});
+
+app.post('/sondages', (req, res) => {
+    const { title, description, options } = req.body;
+    const { userId } = req.body;
+
+    const newSondage = {
+        id_du_sondeur: userId,
+        titre: title,
+        description: description,
+        options: options,
+    };
+
+    const sondagesCollection = mongoose.connection.collection("sondages");
+
+    sondagesCollection.insertOne(newSondage, (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send(err);
+        }
+        console.log('Sondage créé avec succès :', result);
+        res.status(201).send(result);
+
+    });
+});
 
 app.use((req, res, next) => {
     const error = new Error('404 - Page non trouvée');

@@ -24,8 +24,7 @@ const Profile = ({ userId }) => {
 
     const handleLogout = () => {
         setUser(null);
-        // BackHandler.exitApp();
-        //ajouter une route a mon api pour la deco a la bdd
+        BackHandler.exitApp();
     };
 
     if (!user) {
@@ -46,7 +45,7 @@ const Profile = ({ userId }) => {
 
     return (
         <View style={styles.parentContainer}>
-            <Header />
+            <Header userId={userId} />
             <View style={styles.container}>
                 <Text style={styles.title}>Profil de {user.nom} {user.prenom}</Text>
                 <Text style={styles.label}>Date de naissance : </Text>

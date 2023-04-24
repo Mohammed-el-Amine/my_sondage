@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Button, ScrollView } from 'react-native';
+import axios from 'axios';
 
-const SondageForm = ({ onCloseModal, onSubmit }) => {
+const SondageForm = ({ onCloseModal, onSubmit, userId }) => {
+    // console.log(userId)
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [options, setOptions] = useState(['', '']);
@@ -23,15 +25,29 @@ const SondageForm = ({ onCloseModal, onSubmit }) => {
     };
 
     const handleSubmit = () => {
-        onSubmit({ title, description, options });
-        onCloseModal();
+        const formData = {
+            title,
+            description,
+            options,
+            userId,
+        };
+        axios.post('http://10.68.255.234:3000/sondages', formData)
+            .then(response => {
+                setTitle('');
+                setDescription('');
+                setOptions(['', '']);
+                console.log(response.data);
+            })
+            .catch(error => {
+                // Traitez l'erreur ici si nécessaire
+                console.error(error);
+            });
     };
 
     return (
         <ScrollView
             style={styles.container}
             contentContainerStyle={styles.contentContainer}
-            removeClippedSubviews={true}
         >
             <Text style={styles.label}>Titre</Text>
             <TextInput
@@ -46,6 +62,12 @@ const SondageForm = ({ onCloseModal, onSubmit }) => {
                 value={description}
                 onChangeText={setDescription}
                 placeholder="Entrez la description du sondage"
+            />
+            <TextInput
+                style={{ display: 'none' }}
+                value={userId}
+                editable={false}
+                hidden
             />
             <Text style={styles.label}>Options</Text>
             {options.map((option, index) => (
