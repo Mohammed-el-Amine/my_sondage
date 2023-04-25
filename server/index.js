@@ -26,25 +26,20 @@ const userCollection = mongoose.connection.collection("users");
 // Routes
 
 app.post('/signup', async (req, res) => {
-    // Extraire les données du corps de la requête
     const { nom, prenom, dateNaissance, adresse, email, password, confirmPassword } = req.body;
 
     try {
-        // Vérifier si l'utilisateur existe déjà dans la base de données
         const user = await userCollection.findOne({ email });
         if (user) {
             return res.status(400).json({ message: 'Cet email est déjà utilisé.' });
         }
 
-        // Vérifier si le mot de passe et la confirmation du mot de passe sont identiques
         if (password !== confirmPassword) {
             return res.status(400).json({ message: 'Le mot de passe et la confirmation du mot de passe doivent être identiques.' });
         }
 
-        // Hasher le mot de passe
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Créer un nouvel utilisateur
         const newUser = { nom, prenom, dateNaissance, adresse, email, password: hashedPassword };
         await userCollection.insertOne(newUser);
 
@@ -81,13 +76,11 @@ app.get('/profile/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Vérifier si l'utilisateur existe dans la base de données
         const user = await userCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
         if (!user) {
             return res.status(404).json({ message: 'Utilisateur non trouvé.' });
         }
 
-        // Retourner les informations de l'utilisateur
         res.status(200).json(user);
     } catch (error) {
         console.error(error);
@@ -100,16 +93,13 @@ app.post('/profile/:id/password', async (req, res) => {
     const { password } = req.body;
 
     try {
-        // Vérifier si l'utilisateur existe dans la base de données
         const user = await userCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
         if (!user) {
             return res.status(404).json({ message: 'Utilisateur non trouvé.' });
         }
 
-        // Hasher le nouveau mot de passe
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Mettre à jour le mot de passe de l'utilisateur
         await userCollection.updateOne({ _id: new mongoose.Types.ObjectId(id) }, { $set: { password: hashedPassword } });
 
         res.status(200).json({ message: 'Mot de passe modifié avec succès.' });
@@ -169,6 +159,64 @@ app.get('/sondages/:id', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Une erreur est survenue lors de la récupération du sondage.' });
+    }
+});
+
+app.post('/sondages/:id/votes', async (req, res) => {
+
+    const { id } = req.params;
+    const { option } = req.body;
+    const sondagesCollection = mongoose.connection.collection('sondages');
+    const votesCollection = mongoose.connection.collection('votes');
+
+    try {
+        const sondage = await sondagesCollection.findOne({ _id: new mongoose.Types.ObjectId(id) });
+        if (!sondage) {
+            return res.status(404).json({ message: 'Sondage non trouvé.' });
+        }
+
+        const optionExists = sondage.options.some(opt => opt === option);
+        if (!optionExists) {
+            return res.status(400).json({ message: 'Option invalide.' });
+        }
+
+        const alreadyVoted = await votesCollection.findOne({ sondageId: id, id_du_sondeur: sondage.id_du_sondeur });
+        if (alreadyVoted) {
+            return res.status(400).json({ message: 'Vous avez déjà voté pour ce sondage.' });
+        }
+
+        const vote = {
+            sondageId: id,
+            option: option,
+            id_du_sondeur: sondage.id_du_sondeur
+        };
+        await votesCollection.insertOne(vote);
+
+        res.status(200).json({ message: 'Vote enregistré avec succès.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Une erreur est survenue lors de l\'enregistrement du vote.' });
+    }
+});
+
+app.get('/votes', async (req, res) => {
+    try {
+        const votesCollection = mongoose.connection.collection('votes');
+        const votes = await votesCollection.find().toArray();;
+        const votesBySondage = {};
+        // console.log(votes)
+
+        votes.forEach(vote => {
+            if (!votesBySondage[vote.sondageId]) {
+                votesBySondage[vote.sondageId] = [];
+            }
+            votesBySondage[vote.sondageId].push(vote);
+        });
+
+        res.status(200).json(votesBySondage);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Une erreur est survenue lors de la récupération des votes pour chaque sondage.' });
     }
 });
 

@@ -10,13 +10,19 @@ const Sondages = ({ userId }) => {
     const [selectedSondageId, setSelectedSondageId] = useState(null);
 
     useEffect(() => {
-        axios.get('http://10.68.255.234:3000/sondages')
-            .then(response => {
-                setSondages(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        const fetchData = () => {
+            axios.get('http://10.68.255.234:3000/sondages')
+                .then(response => {
+                    setSondages(response.data);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        };
+
+        const intervalId = setInterval(fetchData, 1000);
+
+        return () => clearInterval(intervalId);
     }, []);
 
     const handleCreateSondageClick = () => {

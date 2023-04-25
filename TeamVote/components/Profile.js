@@ -56,6 +56,7 @@ const Profile = ({ userId }) => {
                 <Text style={styles.label}>Email : </Text>
                 <Text style={styles.value}>{user.email}</Text>
                 <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Vous voulez changer de mot de passe?</Text>
                     <Text style={styles.label}>Nouveau mot de passe : </Text>
                     <TextInput
                         style={styles.input}

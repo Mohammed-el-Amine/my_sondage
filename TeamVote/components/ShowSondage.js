@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import axios from 'axios';
 
 const ShowSondage = ({ sondageId }) => {
@@ -49,12 +49,12 @@ const ShowSondage = ({ sondageId }) => {
                 option: selectedOption
             })
                 .then((response) => {
-                    console.log(response.data);
-                    // TODO: Handle successful vote submission
+                    // console.log(response.data);
+                    alert('Merci \n\nVous avez voté')
+
                 })
                 .catch((error) => {
-                    console.log(error);
-                    // TODO: Handle error with vote submission
+                    alert('vous avez déjà voté')
                 });
         }
     };
@@ -83,9 +83,7 @@ const ShowSondage = ({ sondageId }) => {
 
         </View>
     );
-
 };
-
 
 const styles = {
     container: {
